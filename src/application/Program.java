@@ -10,6 +10,8 @@ import db.DB;
 public class Program {
 
 	public static void main(String[] args) {
+		
+		// Bem-vindo(a)!
 		Connection conn = null;
 		Statement stmt = null;
 		ResultSet rs = null;
