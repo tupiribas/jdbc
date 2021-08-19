@@ -5,6 +5,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -40,7 +41,7 @@ public class Program {
 			String sql = "INSERT INTO seller (Name, Email, BirthDate, BaseSalary, DepartmentId) "
 					+ "VALUES (?, ?, ?, ?, ?)";
 
-			stmt = conn.prepareStatement(sql);
+			stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
 			stmt.setString(1, name);
 			stmt.setString(2, email);
@@ -49,9 +50,10 @@ public class Program {
 			stmt.setInt(5, departmentId);
 
 			int rows = stmt.executeUpdate();
-			System.out.println(name + ", foi adicionado com sucesso!" + rows);
 			
-			rs = stmt.executeQuery("SELECT * FROM seller row: ");
+			verification(name, rows, stmt);
+			
+			rs = stmt.executeQuery("SELECT * FROM seller");
 			
 			while (rs.next()) {
 				System.out.println(rs.getString("Id") + " - " + rs.getString("Name") + " - " + rs.getString("Email")
@@ -70,5 +72,23 @@ public class Program {
 		}
 		sc.close();
 
+	}
+
+	private static void verification(String name, int rows, PreparedStatement stmt) {
+		try {
+			if (rows > 0) {
+				ResultSet rs = stmt.getGeneratedKeys();
+				while (rs.next()) {
+					int id = rs.getInt(1);
+					System.out.println("\n" + name + ", been successfully added! ID=" + id);
+				}
+			}
+			else {
+				System.out.println("No rows affected");
+			}
+		}
+		catch (SQLException e) {
+			System.out.println("ERROR SQL cod.:306>>> " + e.getMessage());
+		}
 	}
 }
